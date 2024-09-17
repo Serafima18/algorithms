@@ -1,0 +1,119 @@
+# 1
+def adjacency_list_to_edge_list(adj_list):
+    edge_list = []
+    for u in range(len(adj_list)):
+        for v in adj_list[u]:
+            if (v, u) not in edge_list:  # Избегаем дублирования (u,v) и (v,u)
+                edge_list.append((u, v))
+    return edge_list
+
+def adjacency_list_to_adjacency_matrix(adj_list):
+    n = len(adj_list)
+    adj_matrix = [[0] * n for _ in range(n)]
+    for u in range(n):
+        for v in adj_list[u]:
+            adj_matrix[u][v] = 1
+            adj_matrix[v][u] = 1  # Граф невзвешенный и неориентированный
+    return adj_matrix
+
+def edge_list_to_adjacency_list(edge_list):
+    max_vertex = max(max(u, v) for u, v in edge_list) + 1
+    adj_list = [[] for _ in range(max_vertex)]
+    for u, v in edge_list:
+        adj_list[u].append(v)
+        adj_list[v].append(u)  # Граф невзвешенный и неориентированный
+    return adj_list
+
+def edge_list_to_adjacency_matrix(edge_list):
+    max_vertex = max(max(u, v) for u, v in edge_list) + 1
+    adj_matrix = [[0] * max_vertex for _ in range(max_vertex)]
+    for u, v in edge_list:
+        adj_matrix[u][v] = 1
+        adj_matrix[v][u] = 1  # Граф невзвешенный и неориентированный
+    return adj_matrix
+
+def adjacency_matrix_to_adjacency_list(adj_matrix):
+    n = len(adj_matrix)
+    adj_list = []
+    for i in range(n): adj_list.append([j for j in range(n) if adj_matrix[i][j] == 1])
+    return adj_list
+
+def adjacency_matrix_to_edge_list(adj_matrix):
+    n = len(adj_matrix)
+    edge_list = []
+    for i in range(n):
+        for j in range(i + 1, n):  # Избегаем дублирования
+            if adj_matrix[i][j] == 1: edge_list.append((i, j))
+    return edge_list
+
+
+
+
+# 2
+def has_odd_cycle(adj_list):
+    visited = set()
+    
+    def dfs(vertex, parent):
+        visited.add(vertex)
+        
+        for neighbor in adj_list[vertex]:
+            # Проверяем, что соседа не было в посещенных (не возвращаемся)
+            if neighbor not in visited:
+                if dfs(neighbor, vertex): return True
+            # Проверка на наличие цикла: если сосед - не родитель и нечетная вершина
+            elif neighbor != parent and neighbor % 2 == 1: return True
+        
+        return False
+    
+    # Запускаем DFS (обход в глубину) только на нечетных вершинах
+    for v in range(len(adj_list)):
+        if v % 2 == 1 and v not in visited: if dfs(v, None): return True
+                
+    return False
+
+
+
+# 3
+def is_mutually_reachable(adj_list, v, u):
+    def dfs(start, target):
+        visited = set()
+        stack = [start]  # Используем стек для обхода в глубину
+
+        while stack:
+            node = stack.pop()
+            if node == target:
+                return True
+            if node not in visited:
+                visited.add(node)
+                for neighbor in adj_list[node]: stack.append(neighbor)
+
+        return False
+
+    # Проверяем путь v -> u
+    if not dfs(v, u): return False
+    
+    # Проверяем путь u -> v
+    if not dfs(u, v): return False
+    
+    return True
+
+
+
+#4
+def findJudge(n, trust):
+    # Если городских судей нет (n == 1), возвращаем 1
+    if n == 1 and not trust: return 1
+    
+    # Массив для подсчета доверительных связей
+    trust_count = [0] * (n + 1)
+    
+    for a, b in trust:
+        trust_count[a] -= 1  # a не доверяет никому
+        trust_count[b] += 1  # b получает доверие от a
+
+    # Поиск городского судьи
+    for person in range(1, n + 1):
+        if trust_count[person] == n - 1: # Судья должен получать доверие от n-1 человек
+            return person
+
+    return -1  # В противном случае судьи нет
