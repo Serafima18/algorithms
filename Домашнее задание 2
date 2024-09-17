@@ -1,0 +1,109 @@
+# 1
+from collections import deque, defaultdict
+
+def topological_sort(vertices, edges):
+    # Создаем граф в виде словаря смежности
+    graph = defaultdict(list)
+    in_degree = {v: 0 for v in vertices}
+
+    # Заполняем граф и считаем входящие ребра
+    for u, v in edges:
+        graph[u].append(v)
+        in_degree[v] += 1
+
+    # Инициализируем очередь для вершин с нулевой степенью входа
+    queue = deque([v for v in vertices if in_degree[v] == 0])
+    
+    sorted_order = []
+
+    while queue:
+        # Извлекаем вершину из очереди
+        current = queue.popleft()
+        sorted_order.append(current)
+
+        # Уменьшаем степень входа для всех соседей
+        for neighbor in graph[current]:
+            in_degree[neighbor] -= 1
+            # Если степень входа соседа стала равна нулю, добавляем его в очередь
+            if in_degree[neighbor] == 0: queue.append(neighbor)
+
+    # Проверка на наличие циклов (если множество отсортированных вершин не равняется количеству вершин)
+    if len(sorted_order) != len(vertices):
+        return "Граф содержит цикл, топологическая сортировка невозможна."
+
+    return sorted_order
+
+
+
+
+#2
+from collections import deque, defaultdict
+
+def topological_sort(vertices, edges):
+    # Создаем граф и заполняем степени входа
+    graph = defaultdict(list)
+    in_degree = {v: 0 for v in vertices}
+
+    # Заполняем граф и считаем входящие ребра
+    for u, v in edges:
+        graph[u].append(v)
+        in_degree[v] += 1
+
+    # Инициализируем очередь для вершин с нулевой степенью входа
+    queue = deque([v for v in vertices if in_degree[v] == 0])
+    
+    sorted_order = []
+
+    while queue:
+        # Извлекаем вершину из очереди
+        current = queue.popleft()
+        sorted_order.append(current)
+
+        # Уменьшаем степень входа для всех соседей
+        for neighbor in graph[current]:
+            in_degree[neighbor] -= 1
+            # Если степень входа соседа стала равна нулю, добавляем его в очередь
+            if in_degree[neighbor] == 0: queue.append(neighbor)
+
+    # Проверка на наличие циклов
+    if len(sorted_order) != len(vertices):
+        return "Граф содержит цикл, топологическая сортировка невозможна."
+
+    return sorted_order
+
+# Задаем вершины и ребра
+V = {'Пиджак', 'Часы', 'Брюки', 'Рубашка', 'Трусы', 'Носки', 'Туфли', 'Галстук', 'Ремень'}
+E = {('Галстук', 'Пиджак'), ('Носки', 'Туфли'), ('Рубашка', 'Ремень'), 
+     ('Рубашка', 'Галстук'), ('Ремень', 'Пиджак'), ('Трусы', 'Брюки'),
+     ('Трусы', 'Туфли'), ('Брюки', 'Туфли'), ('Брюки', 'Ремень')}
+
+# Выполняем топологическую сортировку
+result = topological_sort(V, E)
+
+# Печатаем результат
+print("Последовательность одевания:", result)
+
+
+
+
+#4
+def findProvinces(isConnected):
+    def dfs(city):
+        # Помечаем город как посещенный
+        visited[city] = True
+        for neighbor in range(n):
+            # Если есть связь и сосед еще не посещен, продолжаем DFS
+            if isConnected[city][neighbor] == 1 and not visited[neighbor]:  dfs(neighbor)
+
+    n = len(isConnected)  # Количество городов
+    visited = [False] * n
+    province_count = 0
+
+    # Проходимся по всем городам
+    for city in range(n):
+        # Если город еще не посещен, это новая провинция
+        if not visited[city]:
+            dfs(city)  # Исследуем всю провинцию
+            province_count += 1  # Увеличиваем счетчик провинций
+
+    return province_count
