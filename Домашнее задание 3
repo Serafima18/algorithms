@@ -3,7 +3,7 @@ class Solution:
     def criticalConnections(self, n: int, connections: List[List[int]]) -> List[List[int]]:
         from collections import defaultdict
 
-        # Построение графа
+        # Построение графа для программы
         graph = defaultdict(list)
         for a, b in connections:
             graph[a].append(b)
