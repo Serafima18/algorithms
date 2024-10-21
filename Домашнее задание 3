@@ -15,7 +15,7 @@ class Solution:
         disc = [-1] * n
         result = []
 
-        def dfs(u, parent):
+        def dfs(u, parent): 
             nonlocal graph
             disc[u] = low[u] = self.time
             self.time += 1
