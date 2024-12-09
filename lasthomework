@@ -1,0 +1,85 @@
+#1
+def calculate_days(sorts_of_tea, preferences):
+    # Создаем словарь для подсчета, сколько пакетиков нужно в день
+    daily_tea_usage = {}
+
+    # Для каждого сотрудника определяем, сколько пакетиков чая он выпивает в день
+    for employee, liked_teas in preferences.items():
+        for tea in liked_teas:
+            if tea in daily_tea_usage:
+                daily_tea_usage[tea] += 1
+            else:
+                daily_tea_usage[tea] = 1
+
+    # Теперь посчитаем, на сколько дней хватит чая
+    days = float('inf')  # Инициализируем максимально возможным значением
+
+    for tea, count in daily_tea_usage.items():
+        if tea in sorts_of_tea:
+            days = min(days, sorts_of_tea[tea] // count)
+        else:
+            return 0  # Если какой-то сорт чая не закуплен, то дней не хватит
+
+    return days
+
+
+# Пример данных
+sorts_of_tea = {
+    'Ahmad': 1,
+    'Lipton': 2
+}
+
+preferences = {
+    'A': ['Ahmad', 'Lipton'],
+    'B': ['Ahmad']
+}
+
+days = calculate_days(sorts_of_tea, preferences)
+print(f"Закупленного чая хватит на {days} дней.")
+
+
+#2
+from collections import deque
+
+def min_dynamite_required(maze):
+    rows, cols = len(maze), len(maze[0])
+    visited = [[False for _ in range(cols)] for _ in range(rows)]
+    dynamite_count = 0
+
+    # Движения "Чужих": вверх, вниз, влево, вправо
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    def bfs(start_row, start_col):
+        queue = deque([(start_row, start_col)])
+        visited[start_row][start_col] = True
+        
+        while queue:
+            r, c = queue.popleft()
+            for dr, dc in directions:
+                nr, nc = r + dr, c + dc
+                if 0 <= nr < rows and 0 <= nc < cols and not visited[nr][nc]:
+                    if maze[nr][nc] == 'X':  # Если это "Чужой"
+                        visited[nr][nc] = True
+                        queue.append((nr, nc))
+
+    # Проходим по всей сетке лабиринта
+    for i in range(rows):
+        for j in range(cols):
+            if maze[i][j] == 'X' and not visited[i][j]:  # Находим "Чужого"
+                # Запускаем BFS для блокировки всех связанных "Чужих"
+                bfs(i, j)
+                dynamite_count += 1  # Увеличиваем счетчик динамита
+
+    return dynamite_count
+
+# Пример использования функции
+labyrinth = [
+    ['.', '.', 'X', 'X', '.'],
+    ['X', '.', '.', 'X', 'X'],
+    ['.', 'X', 'X', '.', '.'],
+    ['X', '.', 'X', '.', 'X'],
+    ['.', '.', '.', 'X', 'X']
+]
+
+number_of_dynamite = min_dynamite_required(labyrinth)
+print(f"Минимальное количество динамита, необходимое для блокировки 'Чужих': {number_of_dynamite}")
